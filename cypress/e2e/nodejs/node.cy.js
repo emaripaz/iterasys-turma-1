@@ -20,5 +20,17 @@ describe('Teste do cypress.config.js', () => {
             .then(totalArquivos => {
                 cy.log(`Quantidade de arquivos: ${totalArquivos}`)
             })
+
+    })
+
+    it('le variavel de ambiente do terminal', () => {
+        cy.log(Cypress.env('pedro'))
+    })
+
+    it('le variavel de ambiente do sistema operacional', () => {
+        cy.task('lerEmail')
+            .then(retorno => {
+                cy.log(retorno)
+            })
     })
 })
