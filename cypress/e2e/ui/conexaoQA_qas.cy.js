@@ -1,0 +1,61 @@
+describe('Valida a página de QAs', () => {
+    context('espera sem intercept', () => {
+        beforeEach(() => {
+
+            cy.intercept({ method: 'GET', url: '/api/profile' }, (req) => {
+                req.on('response', (res) => {
+    
+                    res.setDelay(8000)
+                })
+            })
+            
+            cy.visit('/perfis')
+        })
+    
+        it('valida se a página carregou com espera de elemento', () => {
+            cy.contains('h1', 'perfis', { matchCase: false, log: false, timeout: 15000 })
+                .should('be.visible') // exist ou be.visible
+    
+            cy.log('Mensagem de Teste')
+        })
+        
+        // não recomendado
+        it('valida se a página carregou com espera de tempo', () => {
+            
+            // eslint-disable-next-line
+            cy.wait(20000)
+            cy.contains('p', 'Navegue e conecte-se com outros QAs')
+                .should('be.visible')
+        })
+    })
+
+    context('espera com intercept', () => {
+        beforeEach(() => {
+            
+            // cy.intercept({
+            //     method: 'GET',
+            //     url: '/api/profile2'
+            // }).as('apiPerfil')
+
+            cy.intercept('GET', '/api/profile')
+                .as('apiPerfil')
+
+            cy.visit('/perfis')
+                .wait('@apiPerfil')
+        })
+        
+        it('valida se a página carregou com espera de spy', () => {
+
+            cy.contains('p', 'Navegue e conecte-se com outros QAs')
+                .should('be.visible')
+        })
+
+        it('click no botão Ver Perfil', () => {
+            cy.getElement('profile-viewMore')
+                .eq(6)
+                .click()
+
+            cy.wait(5000)
+        })
+    })
+})
